@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7067676119520407124}
   - component: {fileID: 4731283610663963219}
-  m_Layer: 0
+  - component: {fileID: 1187979685603904924}
+  m_Layer: 7
   m_Name: Cell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68,6 +69,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &1187979685603904924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4040576169314241456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d77872573b5f472ab9a1e738c8843c51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5405476722055851914
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,7 +91,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6096757212180135142}
   - component: {fileID: 162228764640969102}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Gfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
