@@ -1,4 +1,5 @@
 ﻿using InputModule;
+using TrajectoryModule;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -19,7 +20,10 @@ public class GameManager : MonoBehaviour
         {
             var hitPoint = _inputManager.MousePos();
             if (hitPoint == default)
+            {
+                _trajectoryVisualizer.DisableTrajectory();
                 return;
+            }
             
             _trajectoryVisualizer.DrawTrajectory(hitPoint);
         }

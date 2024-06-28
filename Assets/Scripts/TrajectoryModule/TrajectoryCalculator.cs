@@ -1,61 +1,58 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using Scripts.BaseGameScripts.Helper;
+using UnityEngine;
 
-public class TrajectoryCalculator
+namespace TrajectoryModule
 {
-    private readonly float _timeStep;
-    private readonly int _maxPoints;
-    private readonly LayerMask _collisionLayerMask;
-
-    public TrajectoryCalculator(float timeStep, int maxPoints, LayerMask collisionLayerMask)
+    public class TrajectoryCalculator
     {
-        _timeStep = timeStep;
-        _maxPoints = maxPoints;
-        _collisionLayerMask = collisionLayerMask;
-    }
+        private readonly LayerMask _collisionLayerMask;
+        private readonly List<Vector3> _positions = new List<Vector3>();
 
-    public Vector3[] CalculateTrajectory(Vector2 startPosition, Vector2 targetPosition)
-    {
-        Vector3[] points = new Vector3[_maxPoints];
-        points[0] = startPosition;
-
-        Vector2 currentPosition = startPosition;
-        Vector2 initialVelocity = (targetPosition - startPosition).normalized * CalculateLaunchVelocity(startPosition, targetPosition);
-        Vector2 currentVelocity = initialVelocity;
-
-        for (int i = 1; i < _maxPoints; i++)
+        public TrajectoryCalculator(LayerMask collisionLayerMask)
         {
-            Vector2 nextPosition = currentPosition + currentVelocity * _timeStep + Physics2D.gravity * (0.5f * _timeStep * _timeStep);
-            RaycastHit2D hit = Physics2D.Linecast(currentPosition, nextPosition, _collisionLayerMask);
-
-            if (hit.collider != null)
-            {
-                if (hit.collider.CompareTag("Ball"))
-                {
-                    break;
-                }
-
-                Vector2 reflectVelocity = Vector2.Reflect(currentVelocity, hit.normal);
-                Vector2 reflectPoint = hit.point;
-                
-                // Adjust nextPosition after reflection
-                nextPosition = reflectPoint + reflectVelocity * _timeStep + Physics2D.gravity * (0.5f * _timeStep * _timeStep);
-
-                // Update current velocity
-                currentVelocity = reflectVelocity;
-            }
-
-            points[i] = nextPosition;
-            currentPosition = nextPosition;
+            _collisionLayerMask = collisionLayerMask;
         }
 
-        return points;
-    }
+        public Vector3[] CalculateTrajectory(Vector3 startPosition, Vector3 targetPosition)
+        {
+            _positions.Clear();
 
-    private float CalculateLaunchVelocity(Vector2 startPosition, Vector2 targetPosition)
-    {
-        // Calculate a suitable launch velocity based on the distance between start and target
-        float distance = Vector2.Distance(startPosition, targetPosition);
-        // You can tweak this calculation based on your game's requirements
-        return distance * 2.0f; // Example: You might want to adjust this factor
+            _positions.Add(startPosition);
+            
+            Vector3 direction = (targetPosition - startPosition).normalized;
+
+            CalculateRecursiveTrajectory(startPosition, direction, 0);
+
+            return _positions.ToArray();
+        }
+
+        private void CalculateRecursiveTrajectory(Vector3 startPoint, Vector3 direction, int currentDepth)
+        {
+            if (currentDepth > 10) // delete that
+            {
+                return;
+            }
+
+            direction.z = 0;
+            startPoint.z = 0;
+
+            RaycastHit2D hit = Physics2D.Raycast(startPoint, direction, Mathf.Infinity, _collisionLayerMask);
+
+
+            if (hit.collider == null)
+            {
+                return;
+            }
+
+            _positions.Add(hit.point); // Add the hit point
+
+            if (!hit.transform.TryGetComponent(out Cell cell))
+            {
+                Vector3 newDirection = Vector3.Reflect(direction, hit.normal);
+                Vector3 newStartPoint = hit.point + (new Vector2(newDirection.x, newDirection.y)).normalized;
+                CalculateRecursiveTrajectory(newStartPoint, newDirection, currentDepth + 1);
+            }
+        }
     }
 }

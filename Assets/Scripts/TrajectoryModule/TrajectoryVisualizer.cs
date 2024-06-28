@@ -1,32 +1,36 @@
 ﻿using UnityEngine;
 
-public class TrajectoryVisualizer : MonoBehaviour
+namespace TrajectoryModule
 {
-    [SerializeField]
-    private float timeStep = 0.1f;
+    public class TrajectoryVisualizer : MonoBehaviour
+    {
+        [SerializeField]
+        private LayerMask collisionLayerMask;
 
-    [SerializeField]
-    private int numPoints = 50;
-
-    [SerializeField]
-    private LayerMask collisionLayerMask;
-
-    [SerializeField]
-    private Transform ballStartPoint;
+        [SerializeField]
+        private Transform ballStartPoint;
     
-    private LineRenderer _lineRenderer;
-    private TrajectoryCalculator _trajectoryCalculator;
+        private LineRenderer _lineRenderer;
+        private TrajectoryCalculator _trajectoryCalculator;
 
-    private void Start()
-    {
-        _lineRenderer = GetComponent<LineRenderer>();
-        _trajectoryCalculator = new TrajectoryCalculator(timeStep, numPoints, collisionLayerMask);
-    }
+        private void Start()
+        {
+            _lineRenderer = GetComponent<LineRenderer>();
+            _trajectoryCalculator = new TrajectoryCalculator(collisionLayerMask);
+        }
 
-    public void DrawTrajectory(Vector2 targetPosition)
-    {
-        Vector3[] points = _trajectoryCalculator.CalculateTrajectory(ballStartPoint.position, targetPosition);
-        _lineRenderer.positionCount = points.Length;
-        _lineRenderer.SetPositions(points);
+
+        public void DisableTrajectory()
+        {
+            _lineRenderer.enabled = false;
+        }
+        public void DrawTrajectory(Vector2 targetPosition)
+        {
+            _lineRenderer.enabled = true;
+
+            Vector3[] points = _trajectoryCalculator.CalculateTrajectory(ballStartPoint.position, targetPosition);
+            _lineRenderer.positionCount = points.Length;
+            _lineRenderer.SetPositions(points);
+        }
     }
 }
